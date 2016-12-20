@@ -1,0 +1,4 @@
+ls -l
+ps -ef
+uname -a
+echo hello world
