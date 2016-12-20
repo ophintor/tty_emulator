@@ -1,4 +1,5 @@
-ls -l
-ps -ef
-uname -a
-echo hello world
+# A set of simple commands
+mkdir /home/dp/test_dir
+ls -ld /home/dp/test_dir
+chmod 777 /home/dp/test_dir
+ls -ld /home/dp/test_dir
