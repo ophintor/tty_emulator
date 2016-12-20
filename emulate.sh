@@ -1,11 +1,12 @@
 #!/bin/bash
 
+# Vars
 SRC=commands.txt
 GREEN="\e[32m"
-BLUE="\e[34m"
 YELLOW="\e[1;93m"
 NO_COLOR="\e[0m"
 
+# Read the file and do the job for me - Thanks!
 while read -r line || [[ -n "$line" ]]; do
     echo -en "$GREEN\$ "
     read -s input </dev/tty
@@ -14,3 +15,5 @@ while read -r line || [[ -n "$line" ]]; do
     echo -en "$NO_COLOR"
     $line
 done < "$SRC"
+
+exit 0
