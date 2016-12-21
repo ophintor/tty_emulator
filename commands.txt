@@ -1,5 +1,4 @@
 # A set of simple commands
-mkdir /home/dp/test_dir
+sudo tail -10 /var/log/syslog
 ls -ld /home/dp/test_dir
-chmod 777 /home/dp/test_dir
-ls -ld /home/dp/test_dir
+ps -ef | grep init
