@@ -9,6 +9,10 @@ function help() {
     echo -e "\thelp: shows help"
 }
 
+function prompt() {
+    echo -en "${GREEN}"
+    echo -n "${PROMPT}"
+}
 
 # Check arguments
 if [ $# -lt 1 ] || [ $# -gt 2 ] || [ "${!#}" == "help" ]; then
@@ -20,7 +24,6 @@ if [ ! -f ${!#} ]; then # ${!#} s the last argument
     echo "File '$1' not found"
     exit 2
 fi
-
 
 # Variables declaration
 SRC=${!#}
@@ -44,12 +47,17 @@ fi
 
 # Read the file and do the job for me - Thanks!
 while read -r line || [[ -n "$line" ]]; do
-    echo -en "${GREEN}${PROMPT}"
+    prompt
     [ $FAST_RUN -eq 1 ] || read -s input </dev/tty
-    echo -en "${YELLOW}${line}" | pv -qL ${SPEED}
+    echo -en "${YELLOW}"
+    echo -n "${line}" | pv -qL ${SPEED}
     [ $FAST_RUN -eq 1 ] && echo -e "\r" || read input </dev/tty
     echo -en "${NO_COLOR}"
-    eval ${line}
+    eval ${line} < /dev/null
 done < "${SRC}"
 
+# Keep the promp until a key is pressed
+prompt
+read -s input </dev/tty
+echo -en "${NO_COLOR}"
 exit 0

@@ -1,0 +1,39 @@
+clear
+docker-machine ls
+# Make sure you open the required port (2377) in your inbound rules for your docker hosts
+docker-machine ssh docker-001 ip a show eth0 
+MASTER_IP=`docker-machine ssh docker-001 ip a show eth0 | grep 172 | awk '{ print $2 }' | cut -d'/' -f1`; echo ${MASTER_IP}
+docker-machine ssh docker-001 "sudo docker swarm init --listen-addr ${IP}:2377 | tee /tmp/output"
+docker-machine ssh docker-001 sudo docker node ls
+clear
+JOIN_COMMAND=`docker-machine ssh docker-001 cat /tmp/output | grep '^   ' | tr -d '\n' | sed 's/[\]    //g'`; echo $JOIN_COMMAND
+docker-machine ssh docker-002 sudo ${JOIN_COMMAND}
+docker-machine ssh docker-003 sudo ${JOIN_COMMAND}
+docker-machine ssh docker-001 sudo docker node ls
+clear
+# Open port 80 in your inbound rules for your docker hosts for the next step
+docker-machine ssh docker-001 sudo docker service create --name webserver -p 80:80 nginx
+docker-machine ssh docker-001 sudo docker service ls
+docker-machine ssh docker-001 sudo docker service ps webserver
+WEB_NODE=`docker-machine ssh docker-001 sudo docker service ps webserver | grep webserver | awk '{ print $4 }'`; echo ${WEB_NODE}
+docker-machine ssh ${WEB_NODE} sudo docker ps
+docker-machine ls
+WEB_NODE_IP=`docker-machine ls | grep ${WEB_NODE} | cut -d'/' -f3 | cut -d':' -f1`; echo ${WEB_NODE_IP}
+curl ${WEB_NODE_IP}
+CONT_ID=`docker-machine ssh ${WEB_NODE} sudo docker ps | grep webserver | cut -b-5`; echo ${CONT_ID}
+docker-machine ssh ${WEB_NODE} sudo docker logs ${CONT_ID}
+clear
+docker-machine ssh docker-001 sudo docker service scale webserver=10
+docker-machine ssh docker-001 sudo docker service inspect webserver --pretty
+docker-machine ssh docker-001 sudo docker service ps webserver
+docker-machine ls
+NODE1_IP=`docker-machine ls | grep docker-001 | cut -d'/' -f3 | cut -d':' -f1`; echo ${NODE1_IP}
+NODE2_IP=`docker-machine ls | grep docker-002 | cut -d'/' -f3 | cut -d':' -f1`; echo ${NODE2_IP}
+NODE3_IP=`docker-machine ls | grep docker-003 | cut -d'/' -f3 | cut -d':' -f1`; echo ${NODE3_IP}
+curl ${NODE1_IP}
+curl ${NODE2_IP}
+curl ${NODE3_IP}
+# Let's shutdown one of the nodes!
+docker-machine ssh docker-003 sudo shutdown -h now
+docker-machine ls
+docker-machine ssh docker-001 sudo docker service ps webserver
