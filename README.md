@@ -7,4 +7,4 @@ The script came from the need to record demos without having to worry too much a
 Check out the demo:
 
 
-[![TTY emulator](https://img.youtube.com/vi/4H2yr0GeAO4/0.jpg)](https://www.youtube.com/watch?v=4H2yr0GeAO4)
+[![TTY emulator](https://img.youtube.com/vi/fjyS1ZgfPSI/0.jpg)](https://www.youtube.com/watch?v=fjyS1ZgfPSI)
