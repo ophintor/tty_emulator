@@ -1,4 +1,0 @@
-# A set of simple commands
-sudo tail -10 /var/log/syslog
-ls -ld /home/dp/test_dir
-ps -ef | grep init

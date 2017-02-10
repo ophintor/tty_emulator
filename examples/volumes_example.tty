@@ -1,0 +1,36 @@
+clear
+# Create a nginx container with a volume '/my_web_data'
+docker run -d -P --name webserver -v /my_web_data nginx
+docker exec -i webserver ls -l /my_web_data
+docker inspect -f '{{ json .Mounts }}' webserver | python -m json.tool
+export LOCAL_VOL=`docker inspect -f '{{ ( index .Mounts 0).Source }}' webserver`
+echo $LOCAL_VOL
+sudo ls -l $LOCAL_VOL
+docker exec -i webserver touch /my_web_data/webdata.txt
+docker exec -i webserver ls -l /my_web_data
+sudo ls -l $LOCAL_VOL
+clear
+# Create another container specifying the volume location in the host
+docker run -d -P --name redis -v /volumes/redis_files:/redis_files redis
+sudo touch /volumes/redis_files/redisfile1.txt
+docker exec -i redis ls -l /redis_files
+clear
+# You can also share a data volume container among containers
+docker inspect -f '{{ json .Mounts }}' webserver | python -m json.tool
+sudo ls -l $LOCAL_VOL
+docker run -d --volumes-from webserver --name db1 postgres
+docker run -d --volumes-from webserver --name db2 postgres
+docker exec -i db1 ls -l /my_web_data
+docker exec -i db2 ls -l /my_web_data
+clear
+# We can also label our volumes
+docker run -d -P --name helloworld -v myawesomevolume:/awesome_vol hello-world
+docker volume ls
+clear
+# We clean it all up
+docker stop $(docker ps -a -q)
+docker rm  $(docker ps -a -q)
+docker ps -a
+docker volume ls
+docker volume rm $(docker volume ls -qf dangling=true)
+docker volume ls
